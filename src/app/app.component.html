@@ -1,0 +1,12 @@
+<div class="main">
+  <h1>{{'Tic'+'Tac'+'Toe'}}</h1>
+  <div [style.opacity]="isEnded ? '.5' : '1'" class="board">
+    <div *ngFor="let element of board | keyvalue;"
+        [ngClass]="fieldClass(+element.key)"
+        [ngStyle]="clickedStyle(+element.key)"
+        (click)="play(+element.key)">
+      <img *ngIf="element.value != null" [src]="fieldImageSource(element.value)" alt="img">
+    </div>
+  </div>
+  <button class="restart" (click)="restartGame()"><span>RESTART</span></button>
+</div>
