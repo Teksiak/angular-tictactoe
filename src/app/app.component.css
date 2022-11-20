@@ -86,3 +86,8 @@ button.restart {
 button.restart:hover {
     transform: scale(1.02);
 }
+button.restart:disabled {
+    cursor: inherit;
+    pointer-events: none;
+    opacity: .6;
+}

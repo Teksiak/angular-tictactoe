@@ -8,5 +8,5 @@
       <img *ngIf="element.value != null" [src]="fieldImageSource(element.value)" alt="img">
     </div>
   </div>
-  <button class="restart" (click)="restartGame()">RESTART</button>
+  <button class="restart" (click)="restartGame()" [disabled]="!isEnded">RESTART</button>
 </div>
