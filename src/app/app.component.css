@@ -55,6 +55,10 @@ div.boardElement:hover {
                 inset 1px 1px 3px rgba(255,255,255,0.4);
 }
 
+div.noHover{
+    pointer-events: none;
+}
+
 div.winningElement {
     background-color: #355e3b;
 }

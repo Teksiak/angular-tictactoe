@@ -102,11 +102,13 @@ export class AppComponent {
         if(this.winningSet[0]!.includes(key)) {
           return "boardElement winningElement"
         }
+        return "boardElement noHover"
       }
-      else {
+      else if(this.winningSet[1] == 'X') {
         if(this.winningSet[0]!.includes(key)) {
           return "boardElement losingElement"
         }
+        return "boardElement noHover"
       }
     }
     return "boardElement"
