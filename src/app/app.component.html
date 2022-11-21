@@ -1,12 +1,23 @@
 <div class="main">
   <h1>{{'Tic'+'Tac'+'Toe'}}</h1>
-  <div [style.opacity]="isEnded ? '.5' : '1'" class="board">
+  <div [style.display]="players.length!=0 ? 'none' : 'flex'" class="choice">
+    <label>
+      <input #circle type="radio" name="player" value="O" checked>
+      <img src="../assets/svg/circle.svg" alt="circle">
+    </label>
+    <label>
+      <input #x type="radio" name="player" value="X">
+      <img style="height: 46px; margin-top: -3px;" src="../assets/svg/x-lg.svg" alt="x">
+    </label>
+  </div>
+  <button [style.display]="players.length!=0 ? 'none' : 'inherit'" class="restart" (click)="choosePlayer(circle.checked ? circle.value : x.checked ? x.value : '')">START</button>
+  <div [style.display]="players.length!=0 ? 'grid' : 'none'" [style.opacity]="isEnded ? '.5' : '1'" class="board">
     <div *ngFor="let element of board | keyvalue;"
         [ngClass]="fieldClass(+element.key)"
         [ngStyle]="clickedStyle(+element.key)"
         (click)="play(+element.key)">
-      <img *ngIf="element.value != null" [src]="fieldImageSource(element.value)" alt="img">
+      <img *ngIf="element.value != null" [src]="fieldImageSource(element.value)" alt="player">
     </div>
   </div>
-  <button class="restart" (click)="restartGame()" [disabled]="!isEnded">RESTART</button>
+  <button [style.display]="players.length!=0 ? 'inherit' : 'none'" class="restart" (click)="restartGame()" [disabled]="!isEnded">RESTART</button>
 </div>

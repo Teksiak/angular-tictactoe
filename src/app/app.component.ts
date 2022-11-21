@@ -29,6 +29,49 @@ export class AppComponent {
     [1,5,9],
     [3,5,7]
   ]
+  public players: Array<"X" | "O" | null> = []
+  public player: "X" | "O" | null = null; 
+  public isEnded: boolean = false;
+  public winningSet: [Array<number>, "X" | "O" | null] = [[], null]
+  public play(key: number) {
+    if(!this.isEnded && this.board[key] == null) {
+      let currentPlayer = this.players[0]
+      this.board[key] = currentPlayer
+  
+      var temp = this.players[0];
+      this.players[0] = this.players[1];
+      this.players[1] = temp;
+      this.isEnded = this.checkWinner()
+    }
+    if(this.isEnded) {
+      this.winningSet = this.getWinningSet()
+    }
+  }
+  public choosePlayer(player: string) {
+    if(player == 'O') {
+      this.players = ['O', 'X']
+    }
+    else {
+      this.players = ['X', 'O']
+    }
+    this.player = this.players[0]
+  }
+  public restartGame() {
+    this.board = {
+      1: null,
+      2: null,
+      3: null,
+      4: null,
+      5: null,
+      6: null,
+      7: null,
+      8: null,
+      9: null
+    };
+    this.isEnded = false;
+    this.winningSet = [[], null];
+    this.players = [];
+  }
   private getWinningSet(): [Array<number>, "X" | "O" | null] {
     for(const arr of this.winningCombinations) {
       let player = this.board[arr[0]]
@@ -52,38 +95,6 @@ export class AppComponent {
     }
     return false;
   }
-  public players: Array<"X" | "O" | null> = ['O', 'X']
-  public isEnded: boolean = false;
-  public winningSet: [Array<number>, "X" | "O" | null] = [[], null]
-  public play(key: number) {
-    if(!this.isEnded && this.board[key] == null) {
-      let currentPlayer = this.players[0]
-      this.board[key] = currentPlayer
-  
-      var temp = this.players[0];
-      this.players[0] = this.players[1];
-      this.players[1] = temp;
-      this.isEnded = this.checkWinner()
-    }
-    if(this.isEnded) {
-      this.winningSet = this.getWinningSet()
-    }
-  }
-  public restartGame() {
-    this.board = {
-      1: null,
-      2: null,
-      3: null,
-      4: null,
-      5: null,
-      6: null,
-      7: null,
-      8: null,
-      9: null
-    };
-    this.isEnded = false;
-    this.winningSet = [[], null];
-  }
 
   public clickedStyle(key: number) {
     if(this.board[key] != null) {
@@ -98,13 +109,13 @@ export class AppComponent {
   }
   public fieldClass(key: number) {
     if(this.isEnded) {
-      if(this.winningSet[1] == 'O') {
+      if(this.winningSet[1] == this.player) {
         if(this.winningSet[0]!.includes(key)) {
           return "boardElement winningElement"
         }
         return "boardElement noHover"
       }
-      else if(this.winningSet[1] == 'X') {
+      else {
         if(this.winningSet[0]!.includes(key)) {
           return "boardElement losingElement"
         }
