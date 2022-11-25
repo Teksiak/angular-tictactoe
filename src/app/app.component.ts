@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { max } from 'rxjs';
 
 type Grid = { [key: number]: "X" | "O" | null }
 
@@ -30,22 +31,75 @@ export class AppComponent {
     [3,5,7]
   ]
   public players: Array<"X" | "O" | null> = []
-  public player: "X" | "O" | null = null; 
+  public player: "X" | "O" | null = null;
+  public opponent: "X" | "O" | null = null;
   public isEnded: boolean = false;
   public winningSet: [Array<number>, "X" | "O" | null] = [[], null]
   public play(key: number) {
     if(!this.isEnded && this.board[key] == null) {
-      let currentPlayer = this.players[0]
-      this.board[key] = currentPlayer
-  
-      var temp = this.players[0];
-      this.players[0] = this.players[1];
-      this.players[1] = temp;
-      this.isEnded = this.checkWinner()
+      this.board[key] = this.player
+      if(Object.values(this.board).includes(null)) {
+        this.ai()
+      }
+
+      let temp = this.checkWinner(this.board)
+      this.isEnded = temp[0]
+      if(this.isEnded) {
+        this.winningSet = temp[1]
+      }
     }
-    if(this.isEnded) {
-      this.winningSet = this.getWinningSet()
+  }
+  public ai() {
+    const choice = (board: Grid) => {
+      let bestScore = -1000
+      let bestMove = -1
+      for(const [key,value] of Object.entries(board)){
+        if(value == null) {
+          board[Number(key)] = this.opponent
+          let score = minimax(board, 0, false)
+          board[Number(key)] = null
+          if(score > bestScore) {
+            bestScore = score;
+            bestMove = Number(key)
+          }
+        }
+      }
+      this.board[bestMove] = this.opponent;
     }
+    const minimax = (board: Grid, depth: number, isMaximizing: boolean) => {
+      let checkWin = this.checkWinner(board)
+      if(checkWin[0]) {
+        let winner = checkWin[1][1]
+        if(winner == this.opponent) { return +1; }
+        if(winner == this.player) { return -1; }
+        if(winner == null) { return 0; }
+      }
+      if(isMaximizing) {
+        let bestScore = -1000
+        for(const [key,value] of Object.entries(board)){
+          if(value == null) {
+            board[Number(key)] = this.opponent
+            let score = minimax(board, depth+1, !isMaximizing);
+            board[Number(key)] = null
+            bestScore = Math.max(score, bestScore)
+          }
+        }
+        return bestScore;
+      }
+      else {
+        let bestScore = 1000
+        for(const [key,value] of Object.entries(board)){
+          if(value == null) {
+            board[Number(key)] = this.player
+            let score = minimax(board, depth+1, !isMaximizing);
+            board[Number(key)] = null
+            bestScore = Math.min(score, bestScore)
+          }
+        }
+        return bestScore;
+      }
+    }
+    choice(this.board)
   }
   public choosePlayer(player: string) {
     if(player == 'O') {
@@ -55,6 +109,7 @@ export class AppComponent {
       this.players = ['X', 'O']
     }
     this.player = this.players[0]
+    this.opponent = this.players[1]
   }
   public restartGame() {
     this.board = {
@@ -72,28 +127,28 @@ export class AppComponent {
     this.winningSet = [[], null];
     this.players = [];
   }
-  private getWinningSet(): [Array<number>, "X" | "O" | null] {
+  private getWinningSet(board: Grid): [Array<number>, "X" | "O" | null] {
     for(const arr of this.winningCombinations) {
-      let player = this.board[arr[0]]
-      if(arr.every( (val) => this.board[val]===player && player != null)) {
+      let player = board[arr[0]]
+      if(arr.every( (val) => board[val]===player && player != null)) {
         return [arr, player];
       }
     }
     return [[], null]
   }
-  private checkWinner() {
+  private checkWinner(board: Grid): [boolean, [Array<number>, "X" | "O" | null]] {
     let winning: boolean = false;
     for(const arr of this.winningCombinations) {
-      let player = this.board[arr[0]]
-      winning = arr.every( (val) => this.board[val]===player && player != null)
-      if(winning == true) {
-        return winning;
+      let player = board[arr[0]]
+      winning = arr.every( (val) => board[val]===player && player != null)
+      if(winning) {
+        return [winning, this.getWinningSet(board)];
       }
     }
-    if(!Object.values(this.board).includes(null)) {
-      return true;
+    if(!Object.values(board).includes(null)) {
+      return [true, this.getWinningSet(board)];
     }
-    return false;
+    return [false, [[], null]];
   }
 
   public clickedStyle(key: number) {
